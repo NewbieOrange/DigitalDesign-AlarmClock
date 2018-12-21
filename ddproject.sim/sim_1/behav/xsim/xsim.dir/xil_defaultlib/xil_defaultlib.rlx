@@ -1,9 +1,0 @@
-0.6
-2017.4
-Dec 15 2017
-21:07:18
-D:/vivado/workplace/ddproject/ddproject.sim/sim_1/behav/xsim/glbl.v,1513215259,verilog,,,,glbl,,,,,,,,
-D:/vivado/workplace/ddproject/ddproject.srcs/sim_1/new/sim.v,1544953514,verilog,,,,sim,,,,,,,,
-D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/hour.v,1544953074,verilog,,D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/minute.v,,hour,,,,,,,,
-D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/minute.v,1544952794,verilog,,D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/second.v,,minute,,,,,,,,
-D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/second.v,1544952526,verilog,,D:/vivado/workplace/ddproject/ddproject.srcs/sim_1/new/sim.v,,second,,,,,,,,
