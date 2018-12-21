@@ -1,0 +1,8 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/hour.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module hour
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/minute.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module minute
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado/workplace/ddproject/ddproject.srcs/sources_1/new/second.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module second
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado/workplace/ddproject/ddproject.srcs/sim_1/new/sim.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sim
