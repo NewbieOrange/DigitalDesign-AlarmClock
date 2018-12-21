@@ -41,8 +41,5 @@ module display(input clk, input reset, input [0:5] hour, input [0:5] min, input 
 			9: segment <= NINE;
 			default: segment <= ZERO;
 		endcase
-		// if (reverseEnable == MIN_1) begin
-		// 	segment <= segment & 8'b01111111;
-		// end
 	end
 endmodule
