@@ -32,8 +32,8 @@ end
 always@(posedge clk)
 begin
     if(enmin==1)enmin=0;
-    if(reset)count=0;
-    else count=count+1;
+    if (reset) count=0;
+    else count = count + 1;
     if(count==60)
     begin
         count=0;

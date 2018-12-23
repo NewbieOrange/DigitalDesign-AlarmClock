@@ -31,8 +31,8 @@ end
 always@(posedge clk)
 begin
     if(enday==1)enday=0;
-    if(reset)count=0;
-    else count=count+1;
+    if (reset) count=0;
+    else count = count + 1;
     if(count==24)
     begin
         count=0;
