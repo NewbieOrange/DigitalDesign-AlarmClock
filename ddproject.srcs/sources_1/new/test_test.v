@@ -20,11 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module test_test(input clk100MHz, output speaker);
+module test_test(input clk100MHz, output speaker, output debug1, output debug2);
 
     // reg [0:63] count = 0;
-    reg [0:31] freq = 200;
-    song song(clk100MHz, freq, speaker);
+    reg [0:31] freq = 440;
+    song song(clk100MHz, freq, speaker, debug1, debug2);
     // initial
     // begin
     // end
