@@ -6,8 +6,11 @@ module display(input clk, input reset, input [0:5] hour, input [0:5] min, input 
 	parameter SEC_0 = 8'b00000001, SEC_1 = 8'b00000010;
 	parameter MIN_0 = 8'b00000100, MIN_1 = 8'b00001000;
 	parameter HOUR_0 = 8'b00010000, HOUR_1 = 8'b00100000;
+	
 	reg [7:0] reverseEnable;
+	reg [7:0] tempSegment;
 	reg [0:3] digit; 
+	
 	initial begin
 	  	enable = 8'b11111111;
 	  	reverseEnable = SEC_0;
@@ -15,7 +18,7 @@ module display(input clk, input reset, input [0:5] hour, input [0:5] min, input 
 	end
 
 	always @(posedge clk) begin
-		if (reverseEnable == 8'b01000000) begin
+		if (reverseEnable == 8'b10000000) begin
 			reverseEnable <= 8'b00000001;
 		end else begin
 			reverseEnable <= reverseEnable << 1;
@@ -28,18 +31,19 @@ module display(input clk, input reset, input [0:5] hour, input [0:5] min, input 
 			HOUR_0: digit <= hour % 10;
 			HOUR_1: digit <= hour / 10;
 		endcase
-		enable <= ~(reverseEnable >> 1);
+		enable <= ~(reverseEnable >> 2);
 		case (digit)
-			1: segment <= ONE;
-			2: segment <= TWO;
-			3: segment <= THREE;
-			4: segment <= FOUR;
-			5: segment <= FIVE;
-			6: segment <= SIX;
-			7: segment <= SEVEN;
-			8: segment <= EIGHT;
-			9: segment <= NINE;
-			default: segment <= ZERO;
+			1: tempSegment <= ONE;
+			2: tempSegment <= TWO;
+			3: tempSegment <= THREE;
+			4: tempSegment <= FOUR;
+			5: tempSegment <= FIVE;
+			6: tempSegment <= SIX;
+			7: tempSegment <= SEVEN;
+			8: tempSegment <= EIGHT;
+			9: tempSegment <= NINE;
+			default: tempSegment <= ZERO;
 		endcase
+		segment <= reverseEnable & 8'b01010000 ? tempSegment & 8'b01111111 : tempSegment;
 	end
 endmodule
