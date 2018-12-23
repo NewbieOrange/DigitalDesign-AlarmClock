@@ -13,37 +13,43 @@ module display(input clk, input reset, input [0:5] hour, input [0:5] min, input 
 	
 	initial begin
 	  	enable = 8'b11111111;
-	  	reverseEnable = SEC_0;
+	  	reverseEnable = 8'b10000000;
 	  	segment = ZERO;
 	end
 
-	always @(posedge clk) begin
-		if (reverseEnable == 8'b10000000) begin
-			reverseEnable <= 8'b00000001;
+	always @(posedge clk or posedge reset) begin
+		if (reset) begin
+		  enable <= 8'b11111111;
+		  reverseEnable <= 8'b10000000;
+		  segment <= 8'b11111111;
 		end else begin
-			reverseEnable <= reverseEnable << 1;
+			if (reverseEnable == 8'b10000000) begin
+				reverseEnable <= 8'b00000001;
+			end else begin
+				reverseEnable <= reverseEnable << 1;
+			end
+			case (reverseEnable)
+				SEC_0: digit <= sec % 10;
+				SEC_1: digit <= sec / 10;
+				MIN_0: digit <= min % 10;
+				MIN_1: digit <= min / 10;
+				HOUR_0: digit <= hour % 10;
+				HOUR_1: digit <= hour / 10;
+			endcase
+			enable <= ~(reverseEnable >> 2);
+			case (digit)
+				1: tempSegment <= ONE;
+				2: tempSegment <= TWO;
+				3: tempSegment <= THREE;
+				4: tempSegment <= FOUR;
+				5: tempSegment <= FIVE;
+				6: tempSegment <= SIX;
+				7: tempSegment <= SEVEN;
+				8: tempSegment <= EIGHT;
+				9: tempSegment <= NINE;
+				default: tempSegment <= ZERO;
+			endcase
+			segment <= reverseEnable & 8'b01010000 ? tempSegment & 8'b01111111 : tempSegment;
 		end
-		case (reverseEnable)
-			SEC_0: digit <= sec % 10;
-			SEC_1: digit <= sec / 10;
-			MIN_0: digit <= min % 10;
-			MIN_1: digit <= min / 10;
-			HOUR_0: digit <= hour % 10;
-			HOUR_1: digit <= hour / 10;
-		endcase
-		enable <= ~(reverseEnable >> 2);
-		case (digit)
-			1: tempSegment <= ONE;
-			2: tempSegment <= TWO;
-			3: tempSegment <= THREE;
-			4: tempSegment <= FOUR;
-			5: tempSegment <= FIVE;
-			6: tempSegment <= SIX;
-			7: tempSegment <= SEVEN;
-			8: tempSegment <= EIGHT;
-			9: tempSegment <= NINE;
-			default: tempSegment <= ZERO;
-		endcase
-		segment <= reverseEnable & 8'b01010000 ? tempSegment & 8'b01111111 : tempSegment;
 	end
 endmodule
