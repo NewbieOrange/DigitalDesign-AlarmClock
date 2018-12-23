@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output [3:0] debug);
+module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output [3:0] debug, output debug2);
     wire clk, clk500, enMin, enHour, enDay;
     reg [0:5] newSec = 6'b000000, newMin = 6'b000000, newHour = 6'b000000;
     wire [0:5] secCount, minCount, hourCount;
@@ -15,18 +15,17 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
 
     reg state = 0; // 0 -> Clock, 1 -> Set time
     reg [5:0] setPosition = 6'b000000;
-    reg [3:0] tempVal;
+    reg [5:0] tempVal;
 
     assign debug = keyboard_val;
+    assign debug2 = state;
 
     always @(keyboard_val) begin
-        if (state == 0) begin
+        if (state == 0 && keyboard_val == 4'ha) begin
             state <= 1;
             setPosition <= 6'b100000;
         end else if (state == 1) begin
-            if (setPosition == 6'b000000) begin
-                state <= 0;
-            end else begin
+            begin
                 case (keyboard_val)
                     4'h0: tempVal <= 0;
                     4'h1: tempVal <= 1;
@@ -40,13 +39,14 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
                     4'h9: tempVal <= 9;
                 endcase
                 case (setPosition)
-                    6'b100000: newHour <= tempVal * 10 + hourCount % 10;
-                    6'b010000: newHour <= hourCount - hourCount % 10 + tempVal;
+                    6'b100000: newHour = tempVal * 10 + hourCount % 10;
+                    6'b010000: newHour = hourCount - hourCount % 10 + tempVal;
                     // 6'b001000: tempMin = tempVal * 10 + minCount % 10;
                     // 6'b000100: tempMin = minCount - minCount % 10 + tempVal;
                     // 6'b000010: tempSec = tempVal * 10 + secCount % 10;
                     // 6'b000001: tempSec = secCount - secCount % 10 + tempVal;
                 endcase
+                newHour = 6'b000000;
                 setPosition <= setPosition >> 1;
             end
         end

@@ -62,4 +62,6 @@ set_property IOSTANDARD LVCMOS33 [get_ports {debug[1]}]
 set_property PACKAGE_PIN M15 [get_ports {debug[1]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {debug[0]}]
 set_property PACKAGE_PIN M16 [get_ports {debug[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports debug2]
+set_property PACKAGE_PIN K17 [get_ports debug2]
 
