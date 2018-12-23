@@ -20,11 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module test_test(input clk100MHz, output speaker, output debug1, output debug2);
+module test_test(input clk100MHz, input enable, output speaker, output debug1, output debug2);
 
     // reg [0:63] count = 0;
-    reg [0:31] freq = 440;
-    song song(clk100MHz, freq, speaker, debug1, debug2);
+    wire clk1, clk2, clk5;
+    wire [31:0] hz;
+    dyndivider div2(clk100MHz, hz, clk2);
+    divider #(2) div1(clk100MHz, clk1);
+    divider #(500) div5(clk100MHz, clk5);
+    song song(clk1, enable, clk2, clk5, speaker, debug1, debug2, hz);
     // initial
     // begin
     // end
