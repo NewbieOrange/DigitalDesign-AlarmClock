@@ -29,15 +29,18 @@ begin
     enmin = 0;
     count = 0;
 end
-always@(posedge clk)
+always@(posedge clk or posedge reset)
 begin
-    if(enmin==1)enmin=0;
-    if (reset) count=0;
-    else count = count + 1;
-    if(count==60)
-    begin
-        count=0;
-        enmin=1;
+    if (reset) 
+        count = 0;
+    else begin
+        if(enmin==1)
+            enmin=0;
+        count = count + 1;
+        if(count==60) begin
+            count=0;
+            enmin=1;
+        end
     end
 end
 endmodule

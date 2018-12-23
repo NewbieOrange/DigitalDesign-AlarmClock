@@ -29,15 +29,18 @@ begin
     enhour = 0;
     count = 0;
 end
-always@(posedge clk)
+always@(posedge clk or posedge reset)
 begin
-    if(enhour==1)enhour=0;
-    if (reset) count=0;
-    else count = count + 1;
-    if(count==60)
-    begin
-        count=0;
-        enhour=1;
+    if (reset) 
+        count = 0;
+    else begin
+        if(enhour==1)
+            enhour=0;
+        count = count + 1;
+        if(count==60) begin
+            count=0;
+            enhour=1;
+        end
     end
 end
 endmodule
