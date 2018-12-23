@@ -1,4 +1,4 @@
-module divider #(parameter hz = 1) (input clk100MHz, output reg clkOut);
+module dyndivider (input clk100MHz, input hz, output reg clkOut);
     reg [0:31] count = 0;
     initial begin
         clkOut = 0;
