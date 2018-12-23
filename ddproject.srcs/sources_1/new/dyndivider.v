@@ -1,4 +1,4 @@
-module dyndivider (input clk100MHz, input hz, output reg clkOut);
+module dyndivider (input clk100MHz, input [31:0] hz, output reg clkOut);
     reg [0:31] count = 0;
     initial begin
         clkOut = 0;
