@@ -20,6 +20,7 @@ module display(input clk, input reset, input [0:5] hour, input [0:5] min, input 
 	always @(posedge clk or posedge reset) begin
 		if (reset) begin
 		  enable <= 8'b11111111;
+		  reverseEnable <= 8'b10000000;
 		  segment <= 8'b11111111;
 		end else begin
 			if (reverseEnable == 8'b10000000) begin
