@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output speaker);
+module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output speaker, output [6:0] debug);
     wire clk, clk2, clk500, dyn_clk;
     wire [5:0] counthour, countmin, countsec;
     wire key_pressed;
@@ -11,10 +11,9 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
     display dis(clk500, reset, counthour, countmin, countsec, enable, segment);
 
     wire [31:0] freq;
-    wire enSong, finish;
-    reg constTrue = 1;
+    wire enAlarm, finish;
     dyndivider dyndiv(clk100MHz, freq, dyn_clk);
-    song s(clk2, constTrue, dyn_clk, clk500, speaker, freq, finish);
+    song s(clk2, enAlarm, dyn_clk, clk500, speaker, freq);
     keyboard kb(clk100MHz, reset, row, col, keyboard_val, key_pressed);
-    controller ct(clk100MHz, reset, keyboard_val, key_pressed, counthour, countmin, countsec);
+    controller ct(clk100MHz, reset, keyboard_val, key_pressed, counthour, countmin, countsec, enAlarm, debug);
 endmodule

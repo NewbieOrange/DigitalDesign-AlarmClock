@@ -4,19 +4,18 @@ module song(input clk,
     input enable,
     input clk2,clk5,
     output reg speaker,
-    output reg [31:0] freq,
-    output reg finish
+    output reg [31:0] freq
     );
     parameter DO=522,RE=586,MI=659,FA=698,SO=784,LA=880,SI=988,DO2=1047,RE2=1172,MI2=1318,DLA=440;
-    reg [0:31] freeeeq = 0;
-    reg [0:10] stat = 0;
-    reg [0:31] count = 0;
+    reg [31:0] freeeeq = 0;
+    reg [10:0] stat = 0;
+    reg [31:0] count = 0;
     initial
     begin
     speaker = 0;
-    stat = 0;
-    finish = 0;
+    stat = 96;
     end
+
     always @(posedge clk)
     begin
     if(enable)begin
@@ -153,12 +152,11 @@ module song(input clk,
         stat=stat+1;
         freq=freeeeq;
         if(stat>127) begin
-          stat=0;
-          finish = 1;
+          stat=96;
         end
     end
     else begin
-        stat=0;
+        stat=96;
     end
     end
     always @(posedge clk5)
