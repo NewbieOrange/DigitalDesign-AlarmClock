@@ -1,42 +1,21 @@
 `timescale 1ns / 1ps
 
-module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output [3:0] debug, output debug2);
-    wire clk, clk500, enMin, enHour, enDay;
-    reg [0:5] newSec = 6'b000000, newMin = 6'b000000, newHour = 6'b000000;
+module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output speaker);
+    wire clk, clk2, clk500, dyn_clk, enMin, enHour, enDay;
     wire [0:5] secCount, minCount, hourCount;
-    wire [3:0] keyboard_val;
     divider #(1) div1(clk100MHz, clk);
+    divider #(2) div2(clk100MHz, clk2);
     divider #(500) div500(clk100MHz, clk500);
     second sec(clk, reset, enMin, secCount);
     minute min(enMin, reset, enHour, minCount);
-    hour hr(enHour, reset, newHour, enDay, hourCount);
+    hour hr(enHour, reset, enDay, hourCount);
     display dis(clk500, reset, hourCount, minCount, secCount, enable, segment);
-    keyboard kb(clk100MHz, reset, row, col, keyboard_val);
+    // keyboard kb(clk100MHz, reset, row, col, keyboard_val);
 
-    reg state = 0; // 0 -> Clock, 1 -> Set time
-    reg [5:0] setPosition = 6'b000000;
-    reg [5:0] tempVal;
-
-    assign debug = keyboard_val;
-    assign debug2 = state;
-
-    always @(keyboard_val) begin
-        case (keyboard_val)
-            4'h0: tempVal <= 0;
-            4'h1: tempVal <= 1;
-            4'h2: tempVal <= 2;
-            4'h3: tempVal <= 3;
-            4'h4: tempVal <= 4;
-            4'h5: tempVal <= 5;
-            4'h6: tempVal <= 6;  
-            4'h7: tempVal <= 7;
-            4'h8: tempVal <= 8;
-            4'h9: tempVal <= 9;
-        endcase
-        case (setPosition)
-            6'b100000: newHour = tempVal * 10 + hourCount % 10;
-            6'b010000: newHour = hourCount - hourCount % 10 + tempVal;
-        endcase
-        setPosition <= setPosition >> 1;
-    end
+    wire [31:0] freq;
+    wire enSong, finish;
+    reg constTrue = 1;
+    dyndivider dyndiv(clk100MHz, freq, dyn_clk);
+    timer t(enMin, constTrue, finish, enSong);
+    song s(clk2, enSong, dyn_clk, clk500, speaker, freq, finish);
 endmodule
