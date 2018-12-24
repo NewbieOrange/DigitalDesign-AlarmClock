@@ -21,7 +21,6 @@
 
 module hour(
 input clk,reset,
-input [0:5] new,
 output reg enday,
 output reg[0:5] count);
 initial
@@ -29,13 +28,11 @@ begin
     enday = 0;
     count = 0;
 end
-always@(posedge clk or posedge reset or posedge new or negedge new)
+always@(posedge clk or posedge reset)
 begin
     if (reset) 
         count = 0;
-    else if (new != 6'b000000) begin 
-        count = new;
-    end else begin
+    else begin
         if(enday==1)
             enday=0;
         count = count + 1;

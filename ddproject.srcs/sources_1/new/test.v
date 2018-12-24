@@ -21,34 +21,22 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
     assign debug2 = state;
 
     always @(keyboard_val) begin
-        if (state == 0 && keyboard_val == 4'ha) begin
-            state <= 1;
-            setPosition <= 6'b100000;
-        end else if (state == 1) begin
-            begin
-                case (keyboard_val)
-                    4'h0: tempVal <= 0;
-                    4'h1: tempVal <= 1;
-                    4'h2: tempVal <= 2;
-                    4'h3: tempVal <= 3;
-                    4'h4: tempVal <= 4;
-                    4'h5: tempVal <= 5;
-                    4'h6: tempVal <= 6;  
-                    4'h7: tempVal <= 7;
-                    4'h8: tempVal <= 8;
-                    4'h9: tempVal <= 9;
-                endcase
-                case (setPosition)
-                    6'b100000: newHour = tempVal * 10 + hourCount % 10;
-                    6'b010000: newHour = hourCount - hourCount % 10 + tempVal;
-                    // 6'b001000: tempMin = tempVal * 10 + minCount % 10;
-                    // 6'b000100: tempMin = minCount - minCount % 10 + tempVal;
-                    // 6'b000010: tempSec = tempVal * 10 + secCount % 10;
-                    // 6'b000001: tempSec = secCount - secCount % 10 + tempVal;
-                endcase
-                newHour = 6'b000000;
-                setPosition <= setPosition >> 1;
-            end
-        end
+        case (keyboard_val)
+            4'h0: tempVal <= 0;
+            4'h1: tempVal <= 1;
+            4'h2: tempVal <= 2;
+            4'h3: tempVal <= 3;
+            4'h4: tempVal <= 4;
+            4'h5: tempVal <= 5;
+            4'h6: tempVal <= 6;  
+            4'h7: tempVal <= 7;
+            4'h8: tempVal <= 8;
+            4'h9: tempVal <= 9;
+        endcase
+        case (setPosition)
+            6'b100000: newHour = tempVal * 10 + hourCount % 10;
+            6'b010000: newHour = hourCount - hourCount % 10 + tempVal;
+        endcase
+        setPosition <= setPosition >> 1;
     end
 endmodule
