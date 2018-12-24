@@ -6,6 +6,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
     parameter setmin1     = 7'b0001000;  
     parameter sethour2    = 7'b0010000;  
     parameter sethour1    = 7'b0100000;
+    parameter toggleAlarm = 7'b1111111;
     parameter outstate    = 7'b0111111;
     
     reg [6:0] current_state = clockstate;
@@ -40,53 +41,70 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
             next_state <= clockstate;
         end
         else if (key_pressed)
-        case(current_state)
-            clockstate: begin
-                next_state = keyboard_val == 4'ha ? sethour1 : clockstate;
-                hour1 <= 0; hour2 <= 0; min1 <= 0; min2 <= 0; sec1 <= 0; sec2 <= 0;
-            end
-            sethour1:
-                if(keyboard_val < 3) begin
-                    hour1 <= keyboard_val;
+            case(current_state)
+                clockstate: begin
+                    case (keyboard_val)
+                        4'ha: next_state <= sethour1;
+                        4'hb: next_state <= toggleAlarm;
+                        default: next_state <= clockstate;
+                    endcase
+                    hour1 <= 0; hour2 <= 0; min1 <= 0; min2 <= 0; sec1 <= 0; sec2 <= 0;
+                end
+                toggleAlarm: begin
+                    case (keyboard_val)
+                        4'h1: begin
+                            enHourAlarm <= 0;
+                            next_state <= clockstate;
+                        end
+                        4'h2: begin
+                            enHourAlarm <= 1;
+                            next_state <= clockstate;
+                        end
+                        default: next_state <= toggleAlarm;
+                    endcase
+                end
+                sethour1:
+                    if(keyboard_val < 3) begin
+                        hour1 <= keyboard_val;
+                        next_state <= sethour2;
+                    end
+                else
+                    begin
+                    next_state <= sethour1;
+                    end
+                sethour2:
+                if(hour1 == 2 && keyboard_val > 3)
+                    begin
                     next_state <= sethour2;
-                end
-            else
-                begin
-                next_state <= sethour1;
-                end
-            sethour2:
-            if(hour1 == 2 && keyboard_val > 3)
-                begin
-                next_state <= sethour2;
-                end
-            else
-                begin
-                hour2 <= keyboard_val;
-                next_state <= setmin1;
-                end
-            setmin1:
-                if(keyboard_val < 6)
-                   begin
-                   min1 <= keyboard_val;
-                   next_state <= setmin2;
-                end
-            setmin2: begin
-                   min2 <= keyboard_val;
-                   next_state <= setsec1;
-                   end
-            setsec1:
-                if(keyboard_val < 6)
-                   begin
-                   sec1 <= keyboard_val;
-                   next_state <= setsec2;
-                   end
-            setsec2: begin
-                   sec2 <= keyboard_val;
-                   next_state <= outstate;
-                   end
-            default:
-                next_state <= clockstate;
-        endcase
+                    end
+                else
+                    begin
+                    hour2 <= keyboard_val;
+                    next_state <= setmin1;
+                    end
+                setmin1:
+                    if(keyboard_val < 6)
+                    begin
+                    min1 <= keyboard_val;
+                    next_state <= setmin2;
+                    end
+                setmin2: begin
+                    min2 <= keyboard_val;
+                    next_state <= setsec1;
+                    end
+                setsec1:
+                    if(keyboard_val < 6)
+                    begin
+                    sec1 <= keyboard_val;
+                    next_state <= setsec2;
+                    end
+                setsec2: begin
+                    sec2 <= keyboard_val;
+                    next_state <= outstate;
+                    end
+                default:
+                    next_state <= clockstate;
+            endcase
         else begin
             if (current_state == outstate) begin
                 counthour <= 10 * hour1 + hour2;
