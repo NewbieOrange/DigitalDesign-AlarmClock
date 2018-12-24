@@ -17,8 +17,7 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
     wire enSong, finish;
     reg constTrue = 1;
     dyndivider dyndiv(clk100MHz, freq, dyn_clk);
-    timer t(clk, constTrue, finish, enSong);
-    song s(clk2, enSong, dyn_clk, clk500, speaker, freq, finish);
+    song s(clk2, constTrue, dyn_clk, clk500, speaker, freq, finish);
     keyboard kb(clk100MHz, reset, row, col, keyboard_val, key_pressed);
     
     parameter clockstate  = 6'b000000;
