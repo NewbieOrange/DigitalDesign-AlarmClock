@@ -2,8 +2,9 @@
 
 module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output speaker);
     wire clk, clk2, clk500, dyn_clk, enMin, enHour, enDay;
-    reg key_pressed;
+    wire key_pressed;
     wire [0:5] secCount, minCount, hourCount;
+    wire [3:0] keyboard_val;
     divider #(1) div1(clk100MHz, clk);
     divider #(2) div2(clk100MHz, clk2);
     divider #(500) div500(clk100MHz, clk500);
@@ -15,7 +16,6 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
     reg [5:0] countmin = 0;
     reg [5:0] countsec = 0;
     display dis(clk500, reset, counthour, countmin, countsec, enable, segment);
-    // keyboard kb(clk100MHz, reset, row, col, keyboard_val);
 
     wire [31:0] freq;
     wire enSong, finish;
@@ -43,7 +43,7 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
     reg [2:0] sec1;
     reg [3:0] sec2;
     
-    always@*
+    always@(posedge clk100MHz, posedge reset)
       if (reset)
         begin
         hour1 <= 3'b000;
@@ -58,7 +58,7 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
       else
         current_state <= next_state;
     
-    always@ (posedge key_pressed)
+    always @(posedge key_pressed)
     begin
         case(current_state)
             sethour1:
