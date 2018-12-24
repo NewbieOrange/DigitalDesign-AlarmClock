@@ -28,7 +28,8 @@ module keyboard(
   output reg [0:5] sec,
   output reg [0:5] min,
   output reg [0:5] hour,
-  output reg [3:0] keyboard_val   
+  output reg [3:0] keyboard_val,
+  output reg key_pressed_flag
 );
 
 reg [19:0] cnt;                   
@@ -101,8 +102,7 @@ always @ (*)
         else
           next_state = NO_KEY_PRESSED;                      
   endcase
- 
-reg       key_pressed_flag;           
+            
 reg [3:0] col_val, row_val;          
  
 always @ (posedge key_clk or posedge rst)
