@@ -1,4 +1,4 @@
-module display(input clk, input reset, input [0:5] hour, input [0:5] min, input [0:5] sec,
+module display(input clk, input reset, input [5:0] hour, input [5:0] min, input [5:0] sec,
 				 output reg [7:0] enable, output reg [7:0] segment);
 	parameter ZERO = 8'b11000000, ONE = 8'b11111001, TWO = 8'b10100100, THREE = 8'b10110000;
 	parameter FOUR = 8'b10011001, FIVE = 8'b10010010, SIX = 8'b10000010;
