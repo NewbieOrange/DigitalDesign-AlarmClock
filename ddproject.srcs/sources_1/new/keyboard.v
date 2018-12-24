@@ -25,9 +25,6 @@ module keyboard(
   input           rst,
   input      [3:0] row,
   output reg [3:0] col,
-  output reg [0:5] sec,
-  output reg [0:5] min,
-  output reg [0:5] hour,
   output reg [3:0] keyboard_val,
   output reg key_pressed_flag
 );
@@ -40,16 +37,6 @@ always @ (posedge clk or posedge rst) begin
     cnt <= 0;
   else
     cnt <= cnt + 1'b1;
-  if (cnt % 60 == 0) begin
-    if (rst)
-      sec = 0;
-    else begin
-      sec = sec + 1;
-      if (sec == 60) begin
-        sec = 0;
-      end
-    end
-  end
 end
     
 assign key_clk = cnt[19];                // (2^20/50M = 21)ms 
@@ -161,22 +148,6 @@ always @ (posedge key_clk or posedge rst)
         8'b0111_0111 : keyboard_val <= 4'hD;        
       endcase
 
-reg [3:0] tempVal;
-
-always @(keyboard_val) begin
-        case (keyboard_val)
-            4'h0: tempVal <= 0;
-            4'h1: tempVal <= 1;
-            4'h2: tempVal <= 2;
-            4'h3: tempVal <= 3;
-            4'h4: tempVal <= 4;
-            4'h5: tempVal <= 5;
-            4'h6: tempVal <= 6;  
-            4'h7: tempVal <= 7;
-            4'h8: tempVal <= 8;
-            4'h9: tempVal <= 9;
-        endcase
-end
 //     vio_0 your_instance_name (
 //  .clk(clk),                // input wire clk
 //  .probe_out0(seg_out)  // output wire [7 : 0] probe_out0
