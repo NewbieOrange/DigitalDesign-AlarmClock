@@ -2,7 +2,7 @@
 
 module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output [3:0] debug, output debug2);
     wire clk, clk500, enMin, enHour, enDay;
-    reg [0:5] newSec = 6'b000000, newMin = 6'b000000, newHour = 6'b000000;
+    reg key_pressed;
     wire [0:5] secCount, minCount, hourCount;
     wire [3:0] keyboard_val;
     divider #(1) div1(clk100MHz, clk);
@@ -11,32 +11,109 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
     minute min(enMin, reset, enHour, minCount);
     hour hr(enHour, reset, newHour, enDay, hourCount);
     display dis(clk500, reset, hourCount, minCount, secCount, enable, segment);
-    keyboard kb(clk100MHz, reset, row, col, keyboard_val);
+    keyboard kb(clk100MHz, reset, row, col, keyboard_val, key_pressed);
 
-    reg state = 0; // 0 -> Clock, 1 -> Set time
-    reg [5:0] setPosition = 6'b000000;
-    reg [5:0] tempVal;
-
-    assign debug = keyboard_val;
-    assign debug2 = state;
-
-    always @(keyboard_val) begin
-        case (keyboard_val)
-            4'h0: tempVal <= 0;
-            4'h1: tempVal <= 1;
-            4'h2: tempVal <= 2;
-            4'h3: tempVal <= 3;
-            4'h4: tempVal <= 4;
-            4'h5: tempVal <= 5;
-            4'h6: tempVal <= 6;  
-            4'h7: tempVal <= 7;
-            4'h8: tempVal <= 8;
-            4'h9: tempVal <= 9;
+    
+    parameter setsec2     = 6'b000001;   
+    parameter setsec1     = 6'b000010; 
+    parameter setmin2     = 6'b000100; 
+    parameter setmin1     = 6'b001000;  
+    parameter sethour2    = 6'b010000;  
+    parameter sethour1    = 6'b100000;
+    parameter outstate    = 6'b111111;
+    
+    reg [5:0] current_state;
+    reg [5:0] next_state; 
+    reg [2:0] hour1;
+    reg [3:0] hour2;
+    reg [2:0] min1;
+    reg [3:0] min2;
+    reg [2:0] sec1;
+    reg [3:0] sec2;
+    reg [5:0] counthour;
+    reg [5:0] countmin;
+    reg [5:0] countsec;
+    
+    always@*
+      if (reset)
+        begin
+        hour1 <= 3'b000;
+        min1 <= 3'b000;
+        sec1 <= 3'b000;
+        hour2 <= 4'b0000;
+        min2 <= 4'b0000;
+        sec2 <= 3'b0000;
+        current_state <= sethour1;
+        next_state <= sethour1;
+        end
+      else
+        current_state <= next_state;
+    
+    always@ (posedge key_pressed)
+    begin
+        case(current_state)
+            sethour1:
+            if(keyboard_val < 3'b111)
+                begin
+                hour1 <= keyboard_val;
+                next_state <= sethour2;
+                end
+            else
+                begin
+                next_state <= sethour1;
+                end
+            sethour2:
+            if(hour1 == 6 && keyboard_val > 0)
+                begin
+                next_state <= sethour2;
+                end
+            else if (hour1 < 6)
+                begin
+                hour2 <= keyboard_val;
+                next_state <= setmin1;
+                end
+            setmin1:
+                if(keyboard_val < 7)
+                   begin
+                   min1 = keyboard_val;
+                   next_state <= setmin2;
+                end
+            setmin2:
+                if(min1 == 6 && keyboard_val > 0)
+                   begin
+                   next_state <= setmin2;
+                   end
+                else if (min1 < 6)
+                   begin
+                   min2 <= keyboard_val;
+                   next_state <= setsec1;
+                   end   
+            setsec1:
+                if(keyboard_val < 7)
+                   begin
+                   sec1 = keyboard_val;
+                   next_state <= setsec2;
+                   end
+            setsec2:
+                 if(sec1 == 6 && keyboard_val > 0)
+                   begin
+                   next_state <= setsec1;
+                   end
+                 else if (sec1 < 6)
+                   begin
+                   sec2 <= keyboard_val;
+                   next_state <= outstate;
+                 end 
+            default:
+                next_state <= 6'b000000;                
         endcase
-        case (setPosition)
-            6'b100000: newHour = tempVal * 10 + hourCount % 10;
-            6'b010000: newHour = hourCount - hourCount % 10 + tempVal;
-        endcase
-        setPosition <= setPosition >> 1;
-    end
+        end
+    
+    always@(current_state)
+            if(current_state == outstate)
+                begin
+                    counthour = 10* hour1 + hour2;
+                    countmin = 10 * min1 + min2;
+                    countsec = 10 * sec1 + sec2;
+                end
 endmodule
