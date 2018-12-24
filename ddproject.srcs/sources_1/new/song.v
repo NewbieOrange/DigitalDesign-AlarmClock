@@ -1,31 +1,11 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2018/12/21 12:47:50
-// Design Name: 
-// Module Name: song
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module song(input clk,
     input enable,
     input clk2,clk5,
     output reg speaker,
-    output reg debug1,debug2,
-    output reg [31:0] freq
+    output reg [31:0] freq,
+    output reg finish
     );
     parameter DO=522,RE=586,MI=659,FA=698,SO=784,LA=880,SI=988,DO2=1047,RE2=1172,MI2=1318,DLA=440;
     reg [0:31] freeeeq = 0;
@@ -35,11 +15,11 @@ module song(input clk,
     begin
     speaker = 0;
     stat = 0;
+    finish = 0;
     end
     always @(posedge clk)
     begin
     if(enable)begin
-        debug1=1;
         case(stat)
         0: freeeeq = LA;
         1: freeeeq = LA;
@@ -172,11 +152,13 @@ module song(input clk,
         endcase
         stat=stat+1;
         freq=freeeeq;
-        if(stat>127)stat=0;
+        if(stat>127) begin
+          stat=0;
+          finish = 1;
+        end
     end
     else begin
         stat=0;
-        debug1=0; 
     end
     end
     always @(posedge clk5)
