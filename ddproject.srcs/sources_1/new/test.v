@@ -11,10 +11,11 @@ module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, out
     divider #(1000) div1000(clk100MHz, clk1000);
     display dis(clk1000, reset, counthour, countmin, countsec, enable, segment);
 
+    reg [31:0] which = 1;
     wire [31:0] freq;
     wire enAlarm, finish;
     dyndivider dyndiv(clk100MHz, freq, dyn_clk);
-    song s(clk2, enAlarm, dyn_clk, clk500, speaker, freq);
+    song s(clk2, enAlarm, which, dyn_clk, clk500, speaker, freq);
     keyboard kb(clk100MHz, reset, row, col, keyboard_val, key_pressed);
     controller ct(clk100MHz, reset, keyboard_val, key_pressed, counthour, countmin, countsec, enAlarm, debug);
 endmodule

@@ -5,9 +5,20 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
     parameter setmin2     = 7'b0000100; 
     parameter setmin1     = 7'b0001000;  
     parameter sethour2    = 7'b0010000;  
-    parameter sethour1    = 7'b0100000;
-    parameter toggleAlarm = 7'b1111111;
+    parameter a_sethour1    = 7'b0100000;
+    parameter a_setsec2     = 7'b0000001;   
+    parameter a_setsec1     = 7'b0000010; 
+    parameter a_setmin2     = 7'b0000100; 
+    parameter a_setmin1     = 7'b0001000;  
+    parameter a_sethour2    = 7'b0010000;  
+    parameter a_sethour1    = 7'b0100000;
+    parameter a_outState = 7'b1111111;
+    parameter toggleAlarm = 7'b0101111;
     parameter outstate    = 7'b0111111;
+    parameter setAlarmLen = 7'b0000111;
+    parameter setAlarmLen_2 = 7'b0001111;
+    parameter waitState = 7'b0101010;
+    parameter outAlarmState = 7'b0011111;
     
     reg [6:0] current_state = clockstate;
     reg [6:0] next_state = clockstate;
@@ -24,6 +35,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
     reg enHourAlarm = 0;
     reg enUserAlarm = 0;
     reg [31:0] alarmLeft = 0;
+    reg [31:0] alarmLen = 5;
 
     initial begin
         displayHour = 0;
@@ -55,6 +67,12 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                             sec1 <= enHourAlarm; sec2 <= enHourAlarm;
                             next_state <= toggleAlarm;
                         end
+                        4'hc: begin
+                            hour1 <= alarmLen / 100000; hour2 <= alarmLen % 100000 / 10000;
+                            min1 <= alarmLen % 10000 / 1000; min2 <= alarmLen % 1000 / 100;
+                            sec1 <= alarmLen % 100 / 10; sec2 <= alarmLen % 10;
+                            next_state <= setAlarmLen;
+                        end
                         default: next_state <= clockstate;
                     endcase
                 end
@@ -71,6 +89,36 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                         4'hb: next_state <= clockstate;
                         default: next_state <= toggleAlarm;
                     endcase
+                end
+                setAlarmLen: begin
+                    if (keyboard_val < 10) begin
+                        sec1 <= keyboard_val;
+                        next_state <= setAlarmLen_2;
+                    end else if (keyboard_val == 4'hc) begin
+                        sec1 <= displaySec % 10;
+                        next_state <= outAlarmState;
+                    end else begin
+                        sec1 <= displaySec % 10;
+                        next_state <= setAlarmLen;
+                    end
+                end
+                setAlarmLen_2: begin
+                    if (keyboard_val < 10) begin
+                        sec2 <= keyboard_val;
+                        next_state <= waitState;
+                    end else if (keyboard_val == 4'hc) begin
+                        sec2 <= displaySec % 10;
+                        next_state <= outAlarmState;
+                    end else begin
+                        sec2 <= displaySec % 10;
+                        next_state <= setAlarmLen_2;
+                    end
+                end
+                waitState: begin
+                    if (keyboard_val == 4'hc)
+                        next_state <= outAlarmState;
+                    else
+                        next_state <= waitState;
                 end
                 sethour1:
                     if(keyboard_val < 3) begin
@@ -182,6 +230,10 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                 cnt <= 0;
                 current_state <= clockstate;
                 next_state <= clockstate;
+            end else if (current_state == outAlarmState) begin
+                alarmLen <= sec1 * 10 + sec2;
+                current_state <= clockstate;
+                next_state <= clockstate;
             end else if (current_state == clockstate) begin
                 displayHour <= counthour;
                 displayMin <= countmin;
@@ -207,7 +259,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
             if (countmin == 60) begin
                 countmin <= 0;
                 counthour <= counthour + 1;
-                alarmLeft <= enHourAlarm ? 5 : 0;
+                alarmLeft <= enHourAlarm ? alarmLen : 0;
                 enAlarm <= enHourAlarm ? 1 : 0;
             end
             if (counthour == 24) begin
