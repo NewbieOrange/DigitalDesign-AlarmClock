@@ -9,7 +9,7 @@ module display(input clk, input reset, input [7:0] blink, input blink_clk, input
 	
 	reg [7:0] reverseEnable;
 	reg [7:0] tempSegment;
-	reg [0:3] digit;
+	reg [3:0] digit;
 	
 	initial begin
 	  	enable = 8'b11111111;

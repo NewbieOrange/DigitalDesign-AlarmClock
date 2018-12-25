@@ -46,9 +46,11 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
     
     always @(posedge clk or posedge reset or posedge key_pressed) begin
         if (reset) begin
-            counthour <= 0;
-            countmin <= 0;
-            countsec <= 0;
+            counthour <= 0; countmin <= 0; countsec <= 0;
+            alarmHour <= 0; alarmMin <= 0; alarmSec <= 0;
+            settingAlarm <= 0; enAlarm <= 0; alarmType <= 0;
+            alarmLeft <= 0; alarmLen <= 5;
+            blink <= 8'b00000000;
             cnt <= 0;
             next_state <= clockstate;
         end else if (key_pressed)
@@ -67,7 +69,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                             hour1 <= alarmLen / 100000; hour2 <= alarmLen % 100000 / 10000;
                             min1 <= alarmLen % 10000 / 1000; min2 <= alarmLen % 1000 / 100;
                             sec1 <= alarmLen % 100 / 10; sec2 <= alarmLen % 10;
-                            blink <= 8'b00000000;
+                            blink <= 8'b00001000;
                             settingAlarm <= 0;
                             next_state <= setAlarmLen;
                         end
@@ -89,24 +91,30 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                 setAlarmLen: begin
                     if (keyboard_val < 6) begin
                         sec1 <= keyboard_val;
+                        blink <= 8'b00000100;
                         next_state <= setAlarmLen_2;
                     end else if (keyboard_val == 4'hb) begin
                         sec1 <= displaySec / 10;
+                        blink <= 8'b00000000;
                         next_state <= outAlarmLen;
                     end else begin
                         sec1 <= displaySec / 10;
+                        blink <= 8'b00001000;
                         next_state <= setAlarmLen;
                     end
                 end
                 setAlarmLen_2: begin
                     if (keyboard_val < 10) begin
                         sec2 <= keyboard_val;
+                        blink <= 8'b00000000;
                         next_state <= waitState;
                     end else if (keyboard_val == 4'hb) begin
                         sec2 <= displaySec % 10;
+                        blink <= 8'b00000000;
                         next_state <= outAlarmLen;
                     end else begin
                         sec2 <= displaySec % 10;
+                        blink <= 8'b00000100;
                         next_state <= setAlarmLen_2;
                     end
                 end
