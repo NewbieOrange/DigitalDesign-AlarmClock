@@ -35,7 +35,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
 
     reg settingAlarm = 0;
     reg enHourAlarm = 0;
-    reg enUserAlarm = 1;
+    reg enUserAlarm = 0;
     reg [31:0] alarmLeft = 0;
     reg [31:0] alarmLen = 5;
 
@@ -66,8 +66,8 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                         end
                         4'hb: begin
                             hour1 <= enHourAlarm; hour2 <= enHourAlarm;
-                            min1 <= enHourAlarm; min2 <= enHourAlarm;
-                            sec1 <= enHourAlarm; sec2 <= enHourAlarm;
+                            min1 <= enHourAlarm; min2 <= enUserAlarm;
+                            sec1 <= enUserAlarm; sec2 <= enUserAlarm;
                             settingAlarm <= 0;
                             next_state <= toggleAlarm;
                         end
@@ -96,6 +96,14 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                         end
                         4'h2: begin
                             enHourAlarm <= 1;
+                            next_state <= clockstate;
+                        end
+                        4'h4: begin
+                            enUserAlarm <= 0;
+                            next_state <= clockstate;
+                        end
+                        4'h5: begin
+                            enUserAlarm <= 1;
                             next_state <= clockstate;
                         end
                         4'hb: next_state <= clockstate;
