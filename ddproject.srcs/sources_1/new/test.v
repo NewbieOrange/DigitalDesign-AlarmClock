@@ -1,14 +1,15 @@
 `timescale 1ns / 1ps
 
 module test(input clk100MHz, input reset, input [3:0] row, output [3:0] col, output [7:0] enable, output [7:0] segment, output speaker, output [6:0] debug);
-    wire clk, clk2, clk500, dyn_clk;
+    wire clk, clk2, clk500, clk1000, dyn_clk;
     wire [5:0] counthour, countmin, countsec;
     wire key_pressed;
     wire [3:0] keyboard_val;
     divider #(1) div1(clk100MHz, clk);
     divider #(2) div2(clk100MHz, clk2);
     divider #(500) div500(clk100MHz, clk500);
-    display dis(clk500, reset, counthour, countmin, countsec, enable, segment);
+    divider #(1000) div1000(clk100MHz, clk1000);
+    display dis(clk1000, reset, counthour, countmin, countsec, enable, segment);
 
     wire [31:0] freq;
     wire enAlarm, finish;
