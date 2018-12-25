@@ -46,6 +46,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
     
     always @(posedge clk or posedge reset or posedge key_pressed) begin
         if (reset) begin
+            displayHour <= 0; displayMin <= 0; displaySec <= 0;
             counthour <= 0; countmin <= 0; countsec <= 0;
             alarmHour <= 0; alarmMin <= 0; alarmSec <= 0;
             settingAlarm <= 0; enAlarm <= 0; alarmType <= 0;
@@ -66,20 +67,20 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                             next_state <= sethour1;
                         end
                         4'hb: begin
-                            hour1 <= alarmLen / 100000; hour2 <= alarmLen % 100000 / 10000;
-                            min1 <= alarmLen % 10000 / 1000; min2 <= alarmLen % 1000 / 100;
-                            sec1 <= alarmLen % 100 / 10; sec2 <= alarmLen % 10;
-                            blink <= 8'b00001000;
-                            settingAlarm <= 0;
-                            next_state <= setAlarmLen;
-                        end
-                        4'hc: begin
                             hour1 <= alarmHour / 10; hour2 <= alarmHour % 10;
                             min1 <= alarmMin / 10; min2 <= alarmMin % 10;
                             sec1 <= alarmSec / 10; sec2 <= alarmSec % 10;
                             blink <= 8'b10000000;
                             settingAlarm <= 1;
                             next_state <= b_sethour1;
+                        end
+                        4'hc: begin
+                            hour1 <= alarmLen / 100000; hour2 <= alarmLen % 100000 / 10000;
+                            min1 <= alarmLen % 10000 / 1000; min2 <= alarmLen % 1000 / 100;
+                            sec1 <= alarmLen % 100 / 10; sec2 <= alarmLen % 10;
+                            blink <= 8'b00001000;
+                            settingAlarm <= 0;
+                            next_state <= setAlarmLen;
                         end
                         default: begin
                             blink <= 8'b00000000;
@@ -93,7 +94,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         sec1 <= keyboard_val;
                         blink <= 8'b00000100;
                         next_state <= setAlarmLen_2;
-                    end else if (keyboard_val == 4'hb) begin
+                    end else if (keyboard_val == 4'hc) begin
                         sec1 <= displaySec / 10;
                         blink <= 8'b00000000;
                         next_state <= outAlarmLen;
@@ -108,7 +109,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         sec2 <= keyboard_val;
                         blink <= 8'b00000000;
                         next_state <= waitState;
-                    end else if (keyboard_val == 4'hb) begin
+                    end else if (keyboard_val == 4'hc) begin
                         sec2 <= displaySec % 10;
                         blink <= 8'b00000000;
                         next_state <= outAlarmLen;
@@ -119,7 +120,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                     end
                 end
                 waitState: begin
-                    if (keyboard_val == 4'hb)
+                    if (keyboard_val == 4'hc)
                         next_state <= outAlarmLen;
                     else
                         next_state <= waitState;
@@ -259,7 +260,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         hour1 <= keyboard_val;
                         blink <= 8'b01000000;
                         next_state <= b_sethour2;
-                    end else if (keyboard_val == 4'hc) begin
+                    end else if (keyboard_val == 4'hb) begin
                         hour1 <= displayHour / 10;
                         blink <= 8'b00000000;
                         next_state <= b_outstate;
@@ -282,7 +283,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         hour2 <= hour1 == 2 ? displayHour % 10 : keyboard_val;
                         blink <= hour1 == 2 ? 8'b01000000 : 8'b00100000;
                         next_state <= hour1 == 2 ? b_sethour2 : b_setmin1;
-                    end else if (keyboard_val == 4'hc) begin
+                    end else if (keyboard_val == 4'hb) begin
                         hour2 <= displayHour % 10;
                         blink <= 8'b00000000;
                         next_state <= b_outstate;
@@ -305,7 +306,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         min1 <= keyboard_val;
                         blink <= 8'b00010000;
                         next_state <= b_setmin2;
-                    end else if (keyboard_val == 4'hc) begin
+                    end else if (keyboard_val == 4'hb) begin
                         min1 <= displayMin / 10;
                         blink <= 8'b00000000;
                         next_state <= b_outstate;
@@ -327,7 +328,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         min2 <= keyboard_val;
                         blink <= 8'b00001000;
                         next_state <= b_setsec1;
-                    end else if (keyboard_val == 4'hc) begin
+                    end else if (keyboard_val == 4'hb) begin
                         min2 <= displayMin % 10;
                         blink <= 8'b00000000;
                         next_state <= b_outstate;
@@ -349,7 +350,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         sec1 <= keyboard_val;
                         blink <= 8'b00000100;
                         next_state <= b_setsec2;
-                    end else if (keyboard_val == 4'hc) begin
+                    end else if (keyboard_val == 4'hb) begin
                         sec1 <= displaySec / 10;
                         blink <= 8'b00000000;
                         next_state <= b_outstate;
@@ -371,7 +372,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                         sec2 <= keyboard_val;
                         blink <= 8'b00000000;
                         next_state <= b_outstate;
-                    end else if (keyboard_val == 4'hc) begin
+                    end else if (keyboard_val == 4'hb) begin
                         sec2 <= displaySec % 10;
                         blink <= 8'b00000000;
                         next_state <= b_outstate;
