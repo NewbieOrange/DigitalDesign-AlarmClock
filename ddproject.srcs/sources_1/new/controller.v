@@ -1,4 +1,4 @@
-module controller(input clk, input reset, input [3:0] keyboard_val, input key_pressed, output reg [5:0] displayHour, output reg [5:0] displayMin, output reg [5:0] displaySec, output reg enAlarm, output [6:0] debug);
+module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, input [3:0] keyboard_val, input key_pressed, output reg [5:0] displayHour, output reg [5:0] displayMin, output reg [5:0] displaySec, output reg enAlarm, output reg alarmType);
     parameter clockstate  = 7'b0000000;
     parameter setsec2     = 7'b0000001;   
     parameter setsec1     = 7'b0000010; 
@@ -13,7 +13,6 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
     parameter b_sethour2    = 7'b1010000;
     parameter b_sethour1    = 7'b1100000;
     parameter b_outstate = 7'b1111111;
-    parameter toggleAlarm = 7'b0101111;
     parameter outstate    = 7'b0111111;
     parameter setAlarmLen = 7'b0000111;
     parameter setAlarmLen_2 = 7'b0001111;
@@ -31,11 +30,8 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
     reg [2:0] sec1 = 0;
     reg [3:0] sec2 = 0;
     reg [31:0] cnt = 0;
-    assign debug = current_state;
 
     reg settingAlarm = 0;
-    reg enHourAlarm = 0;
-    reg enUserAlarm = 0;
     reg [31:0] alarmLeft = 0;
     reg [31:0] alarmLen = 5;
 
@@ -44,6 +40,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
         displayMin = 0;
         displaySec = 0;
         enAlarm = 0;
+        alarmType = 0;
     end
     
     always @(posedge clk or posedge reset or posedge key_pressed) begin
@@ -64,13 +61,6 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                             settingAlarm <= 0;
                             next_state <= sethour1;
                         end
-                        4'hb: begin
-                            hour1 <= enHourAlarm; hour2 <= enHourAlarm;
-                            min1 <= enHourAlarm; min2 <= enUserAlarm;
-                            sec1 <= enUserAlarm; sec2 <= enUserAlarm;
-                            settingAlarm <= 0;
-                            next_state <= toggleAlarm;
-                        end
                         4'hc: begin
                             hour1 <= alarmLen / 100000; hour2 <= alarmLen % 100000 / 10000;
                             min1 <= alarmLen % 10000 / 1000; min2 <= alarmLen % 1000 / 100;
@@ -88,37 +78,15 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                         default: next_state <= clockstate;
                     endcase
                 end
-                toggleAlarm: begin
-                    case (keyboard_val)
-                        4'h1: begin
-                            enHourAlarm <= 0;
-                            next_state <= clockstate;
-                        end
-                        4'h2: begin
-                            enHourAlarm <= 1;
-                            next_state <= clockstate;
-                        end
-                        4'h4: begin
-                            enUserAlarm <= 0;
-                            next_state <= clockstate;
-                        end
-                        4'h5: begin
-                            enUserAlarm <= 1;
-                            next_state <= clockstate;
-                        end
-                        4'hb: next_state <= clockstate;
-                        default: next_state <= toggleAlarm;
-                    endcase
-                end
                 setAlarmLen: begin
-                    if (keyboard_val < 10) begin
+                    if (keyboard_val < 6) begin
                         sec1 <= keyboard_val;
                         next_state <= setAlarmLen_2;
                     end else if (keyboard_val == 4'hc) begin
-                        sec1 <= displaySec % 10;
+                        sec1 <= displaySec / 10;
                         next_state <= outAlarmLen;
                     end else begin
-                        sec1 <= displaySec % 10;
+                        sec1 <= displaySec / 10;
                         next_state <= setAlarmLen;
                     end
                 end
@@ -243,7 +211,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                     if(keyboard_val < 3) begin
                         hour1 <= keyboard_val;
                         next_state <= b_sethour2;
-                    end else if (keyboard_val == 4'ha) begin
+                    end else if (keyboard_val == 4'hd) begin
                         hour1 <= displayHour / 10;
                         next_state <= b_outstate;
                     end else if (keyboard_val == 4'hf) begin
@@ -260,7 +228,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                     end else if (keyboard_val < 10) begin
                         hour2 <= hour1 == 2 ? displayHour % 10 : keyboard_val;
                         next_state <= hour1 == 2 ? b_sethour2 : b_setmin1;
-                    end else if (keyboard_val == 4'ha) begin
+                    end else if (keyboard_val == 4'hd) begin
                         hour2 <= displayHour % 10;
                         next_state <= b_outstate;
                     end else if (keyboard_val == 4'he) begin
@@ -277,7 +245,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                     if(keyboard_val < 6) begin
                         min1 <= keyboard_val;
                         next_state <= b_setmin2;
-                    end else if (keyboard_val == 4'ha) begin
+                    end else if (keyboard_val == 4'hd) begin
                         min1 <= displayMin / 10;
                         next_state <= b_outstate;
                     end else if (keyboard_val == 4'he) begin
@@ -294,7 +262,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                     if (keyboard_val < 10) begin
                         min2 <= keyboard_val;
                         next_state <= b_setsec1;
-                    end else if (keyboard_val == 4'ha) begin
+                    end else if (keyboard_val == 4'hd) begin
                         min2 <= displayMin % 10;
                         next_state <= b_outstate;
                     end else if (keyboard_val == 4'he) begin
@@ -311,7 +279,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                     if(keyboard_val < 6) begin
                         sec1 <= keyboard_val;
                         next_state <= b_setsec2;
-                    end else if (keyboard_val == 4'ha) begin
+                    end else if (keyboard_val == 4'hd) begin
                         sec1 <= displaySec / 10;
                         next_state <= b_outstate;
                     end else if (keyboard_val == 4'he) begin
@@ -328,7 +296,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                     if (keyboard_val < 10) begin
                         sec2 <= keyboard_val;
                         next_state <= b_outstate;
-                    end else if (keyboard_val == 4'ha) begin
+                    end else if (keyboard_val == 4'hd) begin
                         sec2 <= displaySec % 10;
                         next_state <= b_outstate;
                     end else if (keyboard_val == 4'he) begin
@@ -387,6 +355,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
                 counthour <= counthour + 1;
                 alarmLeft <= enHourAlarm ? alarmLen : 0;
                 enAlarm <= enHourAlarm ? 1 : 0;
+                alarmType <= enHourAlarm ? 0 : alarmType;
             end
             if (counthour == 24) begin
                 counthour <= 0;
@@ -394,6 +363,7 @@ module controller(input clk, input reset, input [3:0] keyboard_val, input key_pr
             if (countsec == alarmSec && countmin == alarmMin && counthour == alarmHour) begin
                 alarmLeft <= enUserAlarm ? alarmLen : 0;
                 enAlarm <= enUserAlarm ? 1 : 0;
+                alarmType <= enUserAlarm ? 1 : alarmType;
             end
         end
         end

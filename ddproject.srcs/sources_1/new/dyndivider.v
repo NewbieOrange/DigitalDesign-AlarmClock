@@ -1,5 +1,5 @@
 module dyndivider (input clk100MHz, input [31:0] hz, output reg clkOut);
-    reg [0:31] count = 0;
+    reg [31:0] count = 0;
     initial begin
         clkOut = 0;
     end

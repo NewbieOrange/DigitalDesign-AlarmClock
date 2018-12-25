@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module song(input clk,
-    input enable, input [31:0] which,
+    input enable, input which,
     input clk2,clk5,
     output reg speaker,
     output reg [31:0] freq
