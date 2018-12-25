@@ -1,4 +1,4 @@
-module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, input [3:0] keyboard_val, input key_pressed, output reg [5:0] displayHour, output reg [5:0] displayMin, output reg [5:0] displaySec, output reg enAlarm, output reg alarmType);
+module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, input [3:0] keyboard_val, input key_pressed, output reg [7:0] blink, output reg [5:0] displayHour, output reg [5:0] displayMin, output reg [5:0] displaySec, output reg enAlarm, output reg alarmType);
     parameter clockstate  = 7'b0000000;
     parameter setsec2     = 7'b0000001;   
     parameter setsec1     = 7'b0000010; 
@@ -36,6 +36,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
     reg [31:0] alarmLen = 5;
 
     initial begin
+        blink = 8'b00000000;
         displayHour = 0;
         displayMin = 0;
         displaySec = 0;
@@ -58,6 +59,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                             hour1 <= counthour / 10; hour2 <= counthour % 10;
                             min1 <= countmin / 10; min2 <= countmin % 10;
                             sec1 <= countsec / 10; sec2 <= countsec % 10;
+                            blink <= 8'b10000000;
                             settingAlarm <= 0;
                             next_state <= sethour1;
                         end
@@ -65,6 +67,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                             hour1 <= alarmLen / 100000; hour2 <= alarmLen % 100000 / 10000;
                             min1 <= alarmLen % 10000 / 1000; min2 <= alarmLen % 1000 / 100;
                             sec1 <= alarmLen % 100 / 10; sec2 <= alarmLen % 10;
+                            blink <= 8'b00000000;
                             settingAlarm <= 0;
                             next_state <= setAlarmLen;
                         end
@@ -72,6 +75,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                             hour1 <= alarmHour / 10; hour2 <= alarmHour % 10;
                             min1 <= alarmMin / 10; min2 <= alarmMin % 10;
                             sec1 <= alarmSec / 10; sec2 <= alarmSec % 10;
+                            blink <= 8'b00000000;
                             settingAlarm <= 1;
                             next_state <= b_sethour1;
                         end
@@ -108,103 +112,134 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                     else
                         next_state <= waitState;
                 end
-                sethour1:
+                sethour1: begin
                     if(keyboard_val < 3) begin
                         hour1 <= keyboard_val;
+                        blink <= 8'b01000000;
                         next_state <= sethour2;
                     end else if (keyboard_val == 4'ha) begin
                         hour1 <= displayHour / 10;
+                        blink <= 8'b00000000;
                         next_state <= outstate;
                     end else if (keyboard_val == 4'hf) begin
                         hour1 <= displayHour / 10;
+                        blink <= 8'b01000000;
                         next_state <= sethour2;
                     end else begin
                         hour1 <= displayHour / 10;
+                        blink <= 8'b10000000;
                         next_state <= sethour1;
                     end
-                sethour2:
+                end
+                sethour2: begin
                     if(keyboard_val < 4) begin
                         hour2 <= keyboard_val;
+                        blink <= 8'b00100000;
                         next_state <= setmin1;
                     end else if (keyboard_val < 10) begin
                         hour2 <= hour1 == 2 ? displayHour % 10 : keyboard_val;
+                        blink <= hour1 == 2 ? 8'b01000000 : 8'b00100000;
                         next_state <= hour1 == 2 ? sethour2 : setmin1;
                     end else if (keyboard_val == 4'ha) begin
                         hour2 <= displayHour % 10;
+                        blink <= 8'b00000000;
                         next_state <= outstate;
                     end else if (keyboard_val == 4'he) begin
                         hour2 <= displayHour % 10;
+                        blink <= 8'b10000000;
                         next_state <= sethour1;
                     end else if (keyboard_val == 4'hf) begin
                         hour2 <= displayHour % 10;
+                        blink <= 8'b00100000;
                         next_state <= setmin1;
                     end else begin
                         hour2 <= displayHour % 10;
+                        blink <= 8'b01000000;
                         next_state <= sethour2;
                     end
+                end
                 setmin1:
                     if(keyboard_val < 6) begin
                         min1 <= keyboard_val;
+                        blink <= 8'b00010000;
                         next_state <= setmin2;
                     end else if (keyboard_val == 4'ha) begin
                         min1 <= displayMin / 10;
+                        blink <= 8'b00000000;
                         next_state <= outstate;
                     end else if (keyboard_val == 4'he) begin
                         min1 <= displayMin / 10;
+                        blink <= 8'b01000000;
                         next_state <= sethour2;
                     end else if (keyboard_val == 4'hf) begin
                         min1 <= displayMin / 10;
+                        blink <= 8'b00001000;
                         next_state <= setmin2;
                     end else begin
                         min1 <= displayMin / 10;
+                        blink <= 8'b00100000;
                         next_state <= setmin1;
                     end
                 setmin2:
                     if (keyboard_val < 10) begin
                         min2 <= keyboard_val;
+                        blink <= 8'b00001000;
                         next_state <= setsec1;
                     end else if (keyboard_val == 4'ha) begin
                         min2 <= displayMin % 10;
+                        blink <= 8'b00000000;
                         next_state <= outstate;
                     end else if (keyboard_val == 4'he) begin
                         min2 <= displayMin % 10;
+                        blink <= 8'b00100000;
                         next_state <= setmin1;
                     end else if (keyboard_val == 4'hf) begin
                         min2 <= displayMin % 10;
+                        blink <= 8'b00001000;
                         next_state <= setsec1;
                     end else begin
                         min2 <= displayMin % 10;
+                        blink <= 8'b00010000;
                         next_state <= setmin2;
                     end
                 setsec1:
                     if(keyboard_val < 6) begin
                         sec1 <= keyboard_val;
+                        blink <= 8'b00000100;
                         next_state <= setsec2;
                     end else if (keyboard_val == 4'ha) begin
                         sec1 <= displaySec / 10;
+                        blink <= 8'b00000000;
                         next_state <= outstate;
                     end else if (keyboard_val == 4'he) begin
                         sec1 <= displaySec / 10;
+                        blink <= 8'b00010000;
                         next_state <= setmin2;
                     end else if (keyboard_val == 4'hf) begin
                         sec1 <= displaySec / 10;
+                        blink <= 8'b00000100;
                         next_state <= setsec2;
                     end else begin
                         sec1 <= displaySec / 10;
+                        blink <= 8'b00001000;
                         next_state <= setsec1;
                     end
                 setsec2:
                     if (keyboard_val < 10) begin
                         sec2 <= keyboard_val;
+                        blink <= 8'b00000000;
                         next_state <= outstate;
                     end else if (keyboard_val == 4'ha) begin
                         sec2 <= displaySec % 10;
+                        blink <= 8'b00000000;
                         next_state <= outstate;
                     end else if (keyboard_val == 4'he) begin
                         sec2 <= displaySec % 10;
+                        blink <= 8'b00001000;
                         next_state <= setsec1;
                     end else begin
                         sec2 <= displaySec % 10;
+                        blink <= 8'b00000100;
                         next_state <= setsec2;
                     end
                 b_sethour1:
@@ -314,6 +349,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                 counthour <= 10 * hour1 + hour2;
                 countmin <= 10 * min1 + min2;
                 countsec <= 10 * sec1 + sec2;
+                blink <= 8'b00000000;
                 cnt <= 0;
                 current_state <= clockstate;
                 next_state <= clockstate;
@@ -321,6 +357,7 @@ module controller(input clk, input reset, input enHourAlarm, input enUserAlarm, 
                 alarmHour <= 10 * hour1 + hour2;
                 alarmMin <= 10 * min1 + min2;
                 alarmSec <= 10 * sec1 + sec2;
+                blink <= 8'b00000000;
                 settingAlarm <= 0;
                 current_state <= clockstate;
                 next_state <= clockstate;

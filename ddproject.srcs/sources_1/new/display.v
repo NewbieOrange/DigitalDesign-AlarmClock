@@ -1,4 +1,4 @@
-module display(input clk, input reset, input [5:0] hour, input [5:0] min, input [5:0] sec,
+module display(input clk, input reset, input [7:0] blink, input blink_clk, input [5:0] hour, input [5:0] min, input [5:0] sec,
 				 output reg [7:0] enable, output reg [7:0] segment);
 	parameter ZERO = 8'b11000000, ONE = 8'b11111001, TWO = 8'b10100100, THREE = 8'b10110000;
 	parameter FOUR = 8'b10011001, FIVE = 8'b10010010, SIX = 8'b10000010;
@@ -9,7 +9,7 @@ module display(input clk, input reset, input [5:0] hour, input [5:0] min, input 
 	
 	reg [7:0] reverseEnable;
 	reg [7:0] tempSegment;
-	reg [0:3] digit; 
+	reg [0:3] digit;
 	
 	initial begin
 	  	enable = 8'b11111111;
@@ -49,7 +49,7 @@ module display(input clk, input reset, input [5:0] hour, input [5:0] min, input 
 				9: tempSegment <= NINE;
 				default: tempSegment <= ZERO;
 			endcase
-			segment <= reverseEnable & 8'b01010000 ? tempSegment & 8'b01111111 : tempSegment;
+			segment <= tempSegment & (reverseEnable & 8'b01010000 ? 8'b01111111 : 8'b11111111) | ((blink & reverseEnable) && blink_clk ? 8'b01111111 : 8'b00000000);
 		end
 	end
 endmodule
