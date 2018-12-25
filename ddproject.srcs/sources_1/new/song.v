@@ -1,249 +1,242 @@
 `timescale 1ns / 1ps
 
-module song(input clk,
-    input enable, input which,
-    input clk2,clk5,
-    output reg speaker,
-    output reg [31:0] freq
-    );
+module song(input clk, enable, which, clk2, clk5, output reg speaker, output reg [31:0] freq);
     parameter DO=522,RE=586,MI=659,FA=698,SO=784,LA=880,SI=988,DO2=1047,RE2=1172,MI2=1318,DLA=440;
     parameter SI1=494, BMI=1241,LA1=440,SO1=392;
-    reg [31:0] freeeeq = 0;
+
     reg [10:0] stat = 0;
     reg [31:0] count = 0;
-    initial
-    begin
-    speaker = 0;
-    stat = 0;
+
+    initial begin
+        speaker = 0;
+        stat = 0;
     end
 
-    always @(posedge clk)
-    begin
+    always @(posedge clk) begin
+        if(enable) begin
+            case (which)
+                0:  
+                    case(stat)
+                        0: freq = LA;
+                        1: freq = LA;
+                        2: freq = MI;
+                        3: freq = RE;
+                        4: freq = MI;
+                        5: freq = MI;
+                        6: freq = MI;
+                        7: freq = MI;
+                        8: freq = RE;
+                        9: freq = MI;
+                        10: freq = RE;
+                        11: freq = DO;
+                        12: freq = DO;
+                        13: freq = RE;
+                        14: freq = RE;
+                        15: freq = RE;
+                        16: freq = SO;
+                        17: freq = SO;
+                        18: freq = SO;
+                        19: freq = MI;
+                        20: freq = SO;
+                        21: freq = SO;
+                        22: freq = SO;
+                        23: freq = MI;
+                        24: freq = LA;
+                        25: freq = MI;
+                        26: freq = MI;
+                        27: freq = RE;
+                        28: freq = RE;
+                        29: freq = MI;
+                        30: freq = MI;
+                        31: freq = MI;
+                        32: freq = LA;
+                        33: freq = LA;
+                        34: freq = MI;
+                        35: freq = RE;
+                        36: freq = RE;
+                        37: freq = MI;
+                        38: freq = MI;
+                        39: freq = MI;
+                        40: freq = RE;
+                        41: freq = MI;
+                        42: freq = RE;
+                        43: freq = DO;
+                        44: freq = DO;
+                        45: freq = RE;
+                        46: freq = RE;
+                        47: freq = RE;
+                        48: freq = SO;
+                        49: freq = SO;
+                        50: freq = MI;
+                        51: freq = MI;
+                        52: freq = SO;
+                        53: freq = SO;
+                        54: freq = MI;
+                        55: freq = MI;
+                        56: freq = SI;
+                        57: freq = SO;
+                        58: freq = MI;
+                        59: freq = MI;
+                        60: freq = LA;
+                        61: freq = LA;
+                        62: freq = LA;
+                        63: freq = LA;
+                        64: freq = MI;
+                        65: freq = LA;
+                        66: freq = DO2;
+                        67: freq = DO2;
+                        68: freq = MI;
+                        69: freq = LA;
+                        70: freq = DO2;
+                        71: freq = DO2;
+                        72: freq = SI;
+                        73: freq = LA;
+                        74: freq = LA;
+                        75: freq = SO;
+                        76: freq = RE;
+                        77: freq = MI;
+                        78: freq = MI;
+                        79: freq = MI;
+                        80: freq = RE;
+                        81: freq = RE;
+                        82: freq = RE;
+                        83: freq = DLA;
+                        84: freq = RE;
+                        85: freq = MI;
+                        86: freq = SO;
+                        87: freq = SO;
+                        88: freq = MI;
+                        89: freq = SI;
+                        90: freq = SI;
+                        91: freq = SO;
+                        92: freq = RE;
+                        93: freq = MI;
+                        94: freq = MI;
+                        95: freq = MI;
+                        96: freq = MI;
+                        97: freq = LA;
+                        98: freq = DO2;
+                        99: freq = DO2;
+                        100: freq = MI;
+                        101: freq = LA;
+                        102: freq = DO2;
+                        103: freq = DO2;
+                        104: freq = MI2;
+                        105: freq = MI2;
+                        106: freq = RE2;
+                        107: freq = DO2;
+                        108: freq = DO2;
+                        109: freq = RE2;
+                        110: freq = RE2;
+                        111: freq = RE2;
+                        112: freq = MI2;
+                        113: freq = MI2;
+                        114: freq = RE2;
+                        115: freq = DO2;
+                        116: freq = RE2;
+                        117: freq = RE2;
+                        118: freq = DO2;
+                        119: freq = SI;
+                        120: freq = SO;
+                        121: freq = MI;
+                        122: freq = SO;
+                        123: freq = LA;
+                        124: freq = LA;
+                        125: freq = LA;
+                        126: freq = LA;
+                        127: freq = LA;
+                    endcase
+                1:
+                    case (stat)
+                        0: freq = LA1;
+                        1: freq = LA1;
+                        2: freq = LA1;
+                        3: freq = SO1;
+                        4: freq = LA1;
+                        5: freq = LA1;
+                        6: freq = LA1;
+                        7: freq = DO;
+                        8: freq = DO;
+                        9: freq = DO;
+                        10: freq = RE;
+                        11: freq = DO;
+                        12: freq = LA1;
+                        13: freq = LA1;
+                        14: freq = LA1;
+                        15: freq = LA1;
+                        16: freq = DO;
+                        17: freq = DO;
+                        18: freq = DO;
+                        19: freq = SO1;
+                        20: freq = DO;
+                        21: freq = RE;
+                        22: freq = MI;
+                        23: freq = SO;
+                        24: freq = SO;
+                        25: freq = MI;
+                        26: freq = RE;
+                        27: freq = RE;
+                        28: freq = MI;
+                        29: freq = MI;
+                        30: freq = MI;
+                        31: freq = MI;
+                        32: freq = LA;
+                        33: freq = LA;
+                        34: freq = LA;
+                        35: freq = SO;
+                        36: freq = MI;
+                        37: freq = MI;
+                        38: freq = DO;
+                        39: freq = DO;
+                        40: freq = LA1;
+                        41: freq = LA1;
+                        42: freq = LA1;
+                        43: freq = MI;
+                        44: freq = RE;
+                        45: freq = MI;
+                        46: freq = RE;
+                        47: freq = RE;
+                        48: freq = MI;
+                        49: freq = MI;
+                        50: freq = SO;
+                        51: freq = MI;
+                        52: freq = RE;
+                        53: freq = MI;
+                        54: freq = RE;
+                        55: freq = DO;
+                        56: freq = LA1;
+                        57: freq = LA1;
+                        58: freq = SO1;
+                        59: freq = SO1;
+                        60: freq = LA1;
+                        61: freq = LA1;
+                        62: freq = LA1;
+                        63: freq = LA1;
+                    endcase
+                endcase
+                stat = stat + 1;
+                case (which) // Reset when the song reaches the end.
+                    0:
+                        if(stat>127)
+                            stat=0;
+                    1:
+                        if (stat > 63)
+                            stat = 0;
+            endcase
+        end else begin
+            stat = 0;
+        end
+    end
 
-    if(enable)begin
-        case (which)
-            0:  
-                case(stat)
-                    0: freeeeq = LA;
-                    1: freeeeq = LA;
-                    2: freeeeq = MI;
-                    3: freeeeq = RE;
-                    4: freeeeq = MI;
-                    5: freeeeq = MI;
-                    6: freeeeq = MI;
-                    7: freeeeq = MI;
-                    8: freeeeq = RE;
-                    9: freeeeq = MI;
-                    10: freeeeq = RE;
-                    11: freeeeq = DO;
-                    12: freeeeq = DO;
-                    13: freeeeq = RE;
-                    14: freeeeq = RE;
-                    15: freeeeq = RE;
-                    16: freeeeq = SO;
-                    17: freeeeq = SO;
-                    18: freeeeq = SO;
-                    19: freeeeq = MI;
-                    20: freeeeq = SO;
-                    21: freeeeq = SO;
-                    22: freeeeq = SO;
-                    23: freeeeq = MI;
-                    24: freeeeq = LA;
-                    25: freeeeq = MI;
-                    26: freeeeq = MI;
-                    27: freeeeq = RE;
-                    28: freeeeq = RE;
-                    29: freeeeq = MI;
-                    30: freeeeq = MI;
-                    31: freeeeq = MI;
-                    32: freeeeq = LA;
-                    33: freeeeq = LA;
-                    34: freeeeq = MI;
-                    35: freeeeq = RE;
-                    36: freeeeq = RE;
-                    37: freeeeq = MI;
-                    38: freeeeq = MI;
-                    39: freeeeq = MI;
-                    40: freeeeq = RE;
-                    41: freeeeq = MI;
-                    42: freeeeq = RE;
-                    43: freeeeq = DO;
-                    44: freeeeq = DO;
-                    45: freeeeq = RE;
-                    46: freeeeq = RE;
-                    47: freeeeq = RE;
-                    48: freeeeq = SO;
-                    49: freeeeq = SO;
-                    50: freeeeq = MI;
-                    51: freeeeq = MI;
-                    52: freeeeq = SO;
-                    53: freeeeq = SO;
-                    54: freeeeq = MI;
-                    55: freeeeq = MI;
-                    56: freeeeq = SI;
-                    57: freeeeq = SO;
-                    58: freeeeq = MI;
-                    59: freeeeq = MI;
-                    60: freeeeq = LA;
-                    61: freeeeq = LA;
-                    62: freeeeq = LA;
-                    63: freeeeq = LA;
-                    64: freeeeq = MI;
-                    65: freeeeq = LA;
-                    66: freeeeq = DO2;
-                    67: freeeeq = DO2;
-                    68: freeeeq = MI;
-                    69: freeeeq = LA;
-                    70: freeeeq = DO2;
-                    71: freeeeq = DO2;
-                    72: freeeeq = SI;
-                    73: freeeeq = LA;
-                    74: freeeeq = LA;
-                    75: freeeeq = SO;
-                    76: freeeeq = RE;
-                    77: freeeeq = MI;
-                    78: freeeeq = MI;
-                    79: freeeeq = MI;
-                    80: freeeeq = RE;
-                    81: freeeeq = RE;
-                    82: freeeeq = RE;
-                    83: freeeeq = DLA;
-                    84: freeeeq = RE;
-                    85: freeeeq = MI;
-                    86: freeeeq = SO;
-                    87: freeeeq = SO;
-                    88: freeeeq = MI;
-                    89: freeeeq = SI;
-                    90: freeeeq = SI;
-                    91: freeeeq = SO;
-                    92: freeeeq = RE;
-                    93: freeeeq = MI;
-                    94: freeeeq = MI;
-                    95: freeeeq = MI;
-                    96: freeeeq = MI;
-                    97: freeeeq = LA;
-                    98: freeeeq = DO2;
-                    99: freeeeq = DO2;
-                    100: freeeeq = MI;
-                    101: freeeeq = LA;
-                    102: freeeeq = DO2;
-                    103: freeeeq = DO2;
-                    104: freeeeq = MI2;
-                    105: freeeeq = MI2;
-                    106: freeeeq = RE2;
-                    107: freeeeq = DO2;
-                    108: freeeeq = DO2;
-                    109: freeeeq = RE2;
-                    110: freeeeq = RE2;
-                    111: freeeeq = RE2;
-                    112: freeeeq = MI2;
-                    113: freeeeq = MI2;
-                    114: freeeeq = RE2;
-                    115: freeeeq = DO2;
-                    116: freeeeq = RE2;
-                    117: freeeeq = RE2;
-                    118: freeeeq = DO2;
-                    119: freeeeq = SI;
-                    120: freeeeq = SO;
-                    121: freeeeq = MI;
-                    122: freeeeq = SO;
-                    123: freeeeq = LA;
-                    124: freeeeq = LA;
-                    125: freeeeq = LA;
-                    126: freeeeq = LA;
-                    127: freeeeq = LA;
-                endcase
-            1:
-                case (stat)
-                    0: freeeeq = LA1;
-                    1: freeeeq = LA1;
-                    2: freeeeq = LA1;
-                    3: freeeeq = SO1;
-                    4: freeeeq = LA1;
-                    5: freeeeq = LA1;
-                    6: freeeeq = LA1;
-                    7: freeeeq = DO;
-                    8: freeeeq = DO;
-                    9: freeeeq = DO;
-                    10: freeeeq = RE;
-                    11: freeeeq = DO;
-                    12: freeeeq = LA1;
-                    13: freeeeq = LA1;
-                    14: freeeeq = LA1;
-                    15: freeeeq = LA1;
-                    16: freeeeq = DO;
-                    17: freeeeq = DO;
-                    18: freeeeq = DO;
-                    19: freeeeq = SO1;
-                    20: freeeeq = DO;
-                    21: freeeeq = RE;
-                    22: freeeeq = MI;
-                    23: freeeeq = SO;
-                    24: freeeeq = SO;
-                    25: freeeeq = MI;
-                    26: freeeeq = RE;
-                    27: freeeeq = RE;
-                    28: freeeeq = MI;
-                    29: freeeeq = MI;
-                    30: freeeeq = MI;
-                    31: freeeeq = MI;
-                    32: freeeeq = LA;
-                    33: freeeeq = LA;
-                    34: freeeeq = LA;
-                    35: freeeeq = SO;
-                    36: freeeeq = MI;
-                    37: freeeeq = MI;
-                    38: freeeeq = DO;
-                    39: freeeeq = DO;
-                    40: freeeeq = LA1;
-                    41: freeeeq = LA1;
-                    42: freeeeq = LA1;
-                    43: freeeeq = MI;
-                    44: freeeeq = RE;
-                    45: freeeeq = MI;
-                    46: freeeeq = RE;
-                    47: freeeeq = RE;
-                    48: freeeeq = MI;
-                    49: freeeeq = MI;
-                    50: freeeeq = SO;
-                    51: freeeeq = MI;
-                    52: freeeeq = RE;
-                    53: freeeeq = MI;
-                    54: freeeeq = RE;
-                    55: freeeeq = DO;
-                    56: freeeeq = LA1;
-                    57: freeeeq = LA1;
-                    58: freeeeq = SO1;
-                    59: freeeeq = SO1;
-                    60: freeeeq = LA1;
-                    61: freeeeq = LA1;
-                    62: freeeeq = LA1;
-                    63: freeeeq = LA1;
-                endcase
-        endcase
-        stat=stat+1;
-        freq=freeeeq;
-        case (which)
-            0:
-                if(stat>127)
-                    stat=0;
-            1:
-                if (stat > 63)
-                    stat = 0;
-        endcase
-    end
-    else begin
-        stat=0;
-    end
-    end
     always @(posedge clk5)
     begin
-        count=count+1;
-        if(count>=500)count=0;
+        count = count + 1;
+        if (count >= 500) count = 0;
     end
+
     always @(posedge clk2)
     begin
-        if (enable&&count!=0&&count!=250)begin
+        if (enable && count != 0 && count != 250) begin
             speaker <= ~speaker;
         end
     end
