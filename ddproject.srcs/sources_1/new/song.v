@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module song(input clk, enable, which, clk2, clk5, output reg speaker, output reg [31:0] freq);
+module song(input clk, reset, enable, which, clk2, clk5, output reg speaker, output reg [31:0] freq);
     parameter DO=522,RE=586,MI=659,FA=698,SO=784,LA=880,SI=988,DO2=1047,RE2=1172,MI2=1318,DLA=440;
     parameter SI1=494, BMI=1241,LA1=440,SO1=392;
 
@@ -12,8 +12,10 @@ module song(input clk, enable, which, clk2, clk5, output reg speaker, output reg
         stat = 0;
     end
 
-    always @(posedge clk) begin
-        if(enable) begin
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            stat <= 0;
+        end else if (enable) begin
             case (which)
                 0:  
                     case(stat)
@@ -228,15 +230,17 @@ module song(input clk, enable, which, clk2, clk5, output reg speaker, output reg
         end
     end
 
-    always @(posedge clk5)
-    begin
-        count = count + 1;
-        if (count >= 500) count = 0;
+    always @(posedge clk5 or posedge reset) begin
+        if (reset) count <= 0;
+        else begin
+            count = count + 1;
+            if (count >= 500) count = 0;
+        end
     end
 
-    always @(posedge clk2)
-    begin
-        if (enable && count != 0 && count != 250) begin
+    always @(posedge clk2 or posedge reset) begin
+        if (reset) speaker <= 0;
+        else if (enable && count != 0 && count != 250) begin
             speaker <= ~speaker;
         end
     end

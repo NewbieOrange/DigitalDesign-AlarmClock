@@ -13,7 +13,7 @@ module main(input clk100MHz, input reset, input enHourAlarm, input enUserAlarm, 
     wire [31:0] freq;
     wire enAlarm, alarmType;
     dyndivider dyndiv(clk100MHz, freq, dyn_clk);
-    song alarm(clk2, enAlarm, alarmType, dyn_clk, clk1000, speaker, freq);
+    song alarm(clk2, reset, enAlarm, alarmType, dyn_clk, clk1000, speaker, freq);
 
     wire key_pressed;
     wire [3:0] keyboard_val;
