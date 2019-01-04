@@ -4,8 +4,8 @@ module song(input clk, reset, enable, which, clk2, clk5, output reg speaker, out
     parameter DO=522,RE=586,MI=659,FA=698,SO=784,LA=880,SI=988,DO2=1047,RE2=1172,MI2=1318,DLA=440;
     parameter SI1=494, BMI=1241,LA1=440,SO1=392;
 
-    reg [10:0] stat = 0;
-    reg [31:0] count = 0;
+    reg [10:0] stat = 0; // The index of current note of the song.
+    reg [31:0] count = 0; // Temporary variable for counting time.
 
     initial begin
         speaker = 0;
